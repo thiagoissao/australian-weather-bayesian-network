@@ -69,27 +69,27 @@ def probs(data, child, parent1=None, parent2=None, parent3=None):
 
 
 # Create nodes by using our earlier function to automatically calculate probabilities
-C9am = BbnNode(Variable(0, 'C9am', ['<=4', '>4']), probs(
+C9am = BbnNode(Variable(0, 'C9am', [' <= 4', ' > 4']), probs(
     dataFrame, child='Cloud9amCat', parent1='Temp9amCat', parent2='WindGustSpeedCat'))
-C3pm = BbnNode(Variable(1, 'C3pm', ['<=4', '>4']), probs(
+C3pm = BbnNode(Variable(1, 'C3pm', [' <= 4', ' > 4']), probs(
     dataFrame, child='Cloud3pmCat', parent1='Temp3pmCat', parent2='Cloud9amCat', parent3='WindGustSpeedCat'))
-H9am = BbnNode(Variable(2, 'H9am', ['<=60', '>60']), probs(
+H9am = BbnNode(Variable(2, 'H9am', [' <= 60', ' > 60']), probs(
     dataFrame, child='Humidity9amCat', parent1='RainfallCat'))
-H3pm = BbnNode(Variable(3, 'H3pm', ['<=60', '>60']), probs(
+H3pm = BbnNode(Variable(3, 'H3pm', [' <= 60', ' > 60']), probs(
     dataFrame, child='Humidity3pmCat', parent1='Humidity9amCat'))
-RainToday = BbnNode(Variable(4, 'RainToday', ['yes', 'no']), probs(
+RainToday = BbnNode(Variable(4, 'RainToday', [' yes', ' no']), probs(
     dataFrame, child='RainToday'))
-Rainfall = BbnNode(Variable(5, 'Rainfall', ['<=15', '>15']), probs(
+Rainfall = BbnNode(Variable(5, 'Rainfall', [' <= 15', ' > 15']), probs(
     dataFrame, child='RainfallCat', parent1='RainToday'))
-Sunshine = BbnNode(Variable(6, 'Sunshine', ['<=6', '>6']), probs(
+Sunshine = BbnNode(Variable(6, 'Sunshine', [' <= 6', ' > 6']), probs(
     dataFrame, child='SunshineCat'))
-Temp9am = BbnNode(Variable(7, 'Temp9am', ['<=20', '>20']), probs(
+Temp9am = BbnNode(Variable(7, 'Temp9am', [' <= 20', ' > 20']), probs(
     dataFrame, child='Temp9amCat', parent1='SunshineCat'))
-Temp3pm = BbnNode(Variable(8, 'Temp3pm', ['<=20', '>20']), probs(
+Temp3pm = BbnNode(Variable(8, 'Temp3pm', [' <= 20', ' > 20']), probs(
     dataFrame, child='Temp3pmCat', parent1='Temp9amCat'))
-WindGustSpeed = BbnNode(Variable(9, 'W', ['<=40', '>40']),
+WindGustSpeed = BbnNode(Variable(9, 'WindGustSpeed', [' <= 40', ' > 40']),
                         probs(dataFrame, child='WindGustSpeedCat'))
-RainTomorrow = BbnNode(Variable(10, 'RT', ['no', 'yes']), probs(
+RainTomorrow = BbnNode(Variable(10, 'RainTomorrow', [' no ', ' yes']), probs(
     dataFrame, child='RainTomorrow', parent1='Humidity3pmCat', parent2='Cloud3pmCat'))
 
 # Create Network
