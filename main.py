@@ -125,11 +125,10 @@ join_tree = InferenceController.apply(bbn)
 
 def print_probs():
     for node in join_tree.get_bbn_nodes():
-        potential = join_tree.get_bbn_potential(node)
-        print("Node:", node)
-        print("Values:")
-        print(potential)
-        print('----------------')
+        if(node.to_dict()['variable']['id'] == 10):
+            potential = join_tree.get_bbn_potential(node)
+            print("Probabilities for RainTomorrow:")
+            print(potential)
 
 
 # Use the above function to print marginal probabilities
