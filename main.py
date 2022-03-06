@@ -1,5 +1,6 @@
-import pandas as pd  # for data manipulation
-
+from calc_probabilities import Probability
+from csv_reader import get_data_frame  # for data manipulation
+import strings
 # for creating Bayesian Belief Networks (BBN)
 from pybbn.graph.dag import Bbn
 from pybbn.graph.edge import Edge, EdgeType
@@ -8,103 +9,33 @@ from pybbn.graph.variable import Variable
 from pybbn.graph.jointree import EvidenceBuilder
 from pybbn.pptc.inferencecontroller import InferenceController
 
-# Set Pandas options to display more columns
-pd.options.display.max_columns = 50
 
-# Read in the weather data csv
-dataFrame = pd.read_csv('./dataset/weatherAUS-small.csv', encoding='utf-8')
-
-# Drop records where target RainTomorrow=NaN
-dataFrame = dataFrame[pd.isnull(dataFrame['RainTomorrow']) == False]
-
-# For other columns with missing values, fill them in with column mean
-dataFrame = dataFrame.fillna(dataFrame.mean())
-
-# Create bands for variables that we want to use in the model
-dataFrame['Cloud9amCat'] = dataFrame['Cloud9am'].apply(
-    lambda x: '1.>4' if x > 4 else '0.<=4')
-dataFrame['Cloud3pmCat'] = dataFrame['Cloud3pm'].apply(
-    lambda x: '1.>4' if x > 4 else '0.<=4')
-dataFrame['Humidity9amCat'] = dataFrame['Humidity9am'].apply(
-    lambda x: '1.>60' if x > 60 else '0.<=60')
-dataFrame['Humidity3pmCat'] = dataFrame['Humidity3pm'].apply(
-    lambda x: '1.>60' if x > 60 else '0.<=60')
-dataFrame['RainfallCat'] = dataFrame['Rainfall'].apply(
-    lambda x: '1.>15' if x > 15 else '0.<=15')
-dataFrame['SunshineCat'] = dataFrame['Sunshine'].apply(
-    lambda x: '1.>6' if x > 6 else '0.<=6')
-dataFrame['Temp9amCat'] = dataFrame['Temp9am'].apply(
-    lambda x: '1.>20' if x > 20 else '0.<=20')
-dataFrame['Temp3pmCat'] = dataFrame['Temp3pm'].apply(
-    lambda x: '1.>20' if x > 20 else '0.<=20')
-dataFrame['WindGustSpeedCat'] = dataFrame['WindGustSpeed'].apply(
-    lambda x: '0.<=40' if x <= 40 else '1.>40')
-
-
-def probs(data, child, parent1=None, parent2=None):
-    if parent1 == None:
-        # Calculate probabilities
-        prob = pd.crosstab(data[child], 'Empty', margins=False, normalize='columns').sort_index(
-        ).to_numpy().reshape(-1).tolist()
-    elif parent1 != None:
-        # Check if child node has 1 parent or 2 parents
-        if parent2 == None:
-            # Caclucate probabilities
-            prob = pd.crosstab(data[parent1], data[child], margins=False,
-                               normalize='index').sort_index().to_numpy().reshape(-1).tolist()
-        else:
-            # Caclucate probabilities
-            prob = pd.crosstab([data[parent1], data[parent2]], data[child], margins=False,
-                               normalize='index').sort_index().to_numpy().reshape(-1).tolist()
-    else:
-        print("Error in Probability Frequency Calculations")
-    return prob
-
-
-moreThan4 = '>4'
-lessOrEqualThan4 = '<=4'
-
-moreThan60 = '>60'
-lessOrEqualThan60 = '<=60'
-
-moreThan40 = '>40'
-lessOrEqualThan40 = '<=40'
-
-yes = 'yes'
-no = 'no'
-
-moreThan15 = '>15'
-lessOrEqualThan15 = '<=15'
-
-moreThan6 = '>6'
-lessOrEqualThan6 = ' =6'
-
-moreThan20 = '>20'
-lessOrEqualThan20 = '<=20'
+dataFrame = get_data_frame('./dataset/weatherAUS-small.csv')
+probability = Probability()
 
 # Create nodes by using our earlier function to automatically calculate probabilities
-C9am = BbnNode(Variable(0, 'C9am', [lessOrEqualThan4, moreThan4]), probs(
+C9am = BbnNode(Variable(0, 'C9am', [strings.lessOrEqualThan4, strings.moreThan4]), probability.calculate(
     dataFrame, child='Cloud9amCat', parent1='WindGustSpeedCat'))
-C3pm = BbnNode(Variable(1, 'C3pm', [lessOrEqualThan4, moreThan4]), probs(
+C3pm = BbnNode(Variable(1, 'C3pm', [strings.lessOrEqualThan4, strings.moreThan4]), probability.calculate(
     dataFrame, child='Cloud3pmCat', parent1='WindGustSpeedCat', parent2='Cloud9amCat'))
 
-H9am = BbnNode(Variable(2, 'H9am', [lessOrEqualThan60, moreThan60]), probs(
+H9am = BbnNode(Variable(2, 'H9am', [strings.lessOrEqualThan60, strings.moreThan60]), probability.calculate(
     dataFrame, child='Humidity9amCat', parent1='RainfallCat', parent2='Temp9amCat'))
-H3pm = BbnNode(Variable(3, 'H3pm', [lessOrEqualThan60, moreThan60]), probs(
+H3pm = BbnNode(Variable(3, 'H3pm', [strings.lessOrEqualThan60, strings.moreThan60]), probability.calculate(
     dataFrame, child='Humidity3pmCat', parent1='Humidity9amCat', parent2='Temp3pmCat'))
-RainToday = BbnNode(Variable(4, 'RainToday', [no, yes]), probs(
+RainToday = BbnNode(Variable(4, 'RainToday', [strings.no, strings.yes]), probability.calculate(
     dataFrame, child='RainToday'))
-Rainfall = BbnNode(Variable(5, 'Rainfall', [lessOrEqualThan15, moreThan15]), probs(
+Rainfall = BbnNode(Variable(5, 'Rainfall', [strings.lessOrEqualThan15, strings.moreThan15]), probability.calculate(
     dataFrame, child='RainfallCat', parent1='RainToday'))
-Sunshine = BbnNode(Variable(6, 'Sunshine', [lessOrEqualThan6, moreThan6]), probs(
+Sunshine = BbnNode(Variable(6, 'Sunshine', [strings.lessOrEqualThan6, strings.moreThan6]), probability.calculate(
     dataFrame, child='SunshineCat'))
-Temp9am = BbnNode(Variable(7, 'Temp9am', [lessOrEqualThan20, moreThan20]), probs(
+Temp9am = BbnNode(Variable(7, 'Temp9am', [strings.lessOrEqualThan20, strings.moreThan20]), probability.calculate(
     dataFrame, child='Temp9amCat', parent1='SunshineCat'))
-Temp3pm = BbnNode(Variable(8, 'Temp3pm', [lessOrEqualThan20, moreThan20]), probs(
+Temp3pm = BbnNode(Variable(8, 'Temp3pm', [strings.lessOrEqualThan20, strings.moreThan20]), probability.calculate(
     dataFrame, child='Temp3pmCat', parent1='Temp9amCat'))
-WindGustSpeed = BbnNode(Variable(9, 'WindGustSpeed', [lessOrEqualThan40, moreThan40]),
-                        probs(dataFrame, child='WindGustSpeedCat'))
-RainTomorrow = BbnNode(Variable(10, 'RainTomorrow', [no, yes]), probs(
+WindGustSpeed = BbnNode(Variable(9, 'WindGustSpeed', [strings.lessOrEqualThan40, strings.moreThan40]),
+                        probability.calculate(dataFrame, child='WindGustSpeedCat'))
+RainTomorrow = BbnNode(Variable(10, 'RainTomorrow', [strings.no, strings.yes]), probability.calculate(
     dataFrame, child='RainTomorrow', parent1='Humidity3pmCat', parent2='Cloud3pmCat'))
 
 # Create Network
@@ -141,10 +72,10 @@ join_tree = InferenceController.apply(bbn)
 
 def print_probs():
     for node in join_tree.get_bbn_nodes():
-        # if(node.to_dict()['variable']['id'] == 10):
-        potential = join_tree.get_bbn_potential(node)
-        print("Probabilities for RainTomorrow:")
-        print(potential)
+        if(node.to_dict()['variable']['id'] == 10):
+            potential = join_tree.get_bbn_potential(node)
+            print("Probabilities for RainTomorrow:")
+            print(potential)
 
 
 def evidence(ev, nod, cat, val):
@@ -160,7 +91,7 @@ print('\nCenário Padrão')
 print_probs()
 
 # cenario 1
-evidence('evidence1', 'C9am', moreThan4,            0.5)
+evidence('evidence1', 'C9am', strings.moreThan4,            0.5)
 # evidence('evidence2', 'C3pm', moreThan4,            40)
 # evidence('evidence3', 'H9am', moreThan60,           40)
 # evidence('evidence4', 'H3pm', moreThan60,           40)
