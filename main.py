@@ -61,7 +61,14 @@ def create_evidence(ev, nod, cat, val):
 print('\nCenário Padrão')
 show_probabilities()
 
-# cenario 1
-create_evidence('evidence1', 'C9am', strings.moreThan4, 0)
-print('\nCenário #1')
+# # cenario 1
+# create_evidence('evidence1', 'C9am', strings.moreThan4, 0)
+# print('\nCenário #1')
+# show_probabilities()
+
+# cenario 2
+create_evidence('evidence1', 'Temp9am', strings.lessOrEqualThan20, 1)
+create_evidence('evidence2', 'WindGustSpeed', strings.moreThan40, 1)
+create_evidence('evidence2', 'Rainfall', strings.moreThan15, 1)
+print('\nCenário #2')
 show_probabilities()
