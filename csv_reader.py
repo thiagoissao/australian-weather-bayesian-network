@@ -12,7 +12,7 @@ def get_data_frame(path):
     dataFrame = dataFrame[pd.isnull(dataFrame['RainTomorrow']) == False]
 
     # For other columns with missing values, fill them in with column mean
-    dataFrame = dataFrame.fillna(dataFrame.mean())
+    dataFrame = dataFrame.fillna(dataFrame.mean(numeric_only=True))
 
     # Create bands for variables that we want to use in the model
     dataFrame['Cloud9amCat'] = dataFrame['Cloud9am'].apply(
