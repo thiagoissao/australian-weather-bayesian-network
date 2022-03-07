@@ -5,7 +5,7 @@ from pybbn.graph.node import BbnNode
 from pybbn.graph.variable import Variable
 
 
-dataFrame = get_data_frame('./dataset/weatherAUS-small.csv')
+dataFrame = get_data_frame('./dataset/weatherAUS.csv')
 probability = Probability()
 
 # Create nodes by using our earlier function to automatically calculate probabilities
